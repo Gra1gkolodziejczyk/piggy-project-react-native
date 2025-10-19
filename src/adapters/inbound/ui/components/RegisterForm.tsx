@@ -10,24 +10,26 @@ export const RegisterForm = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSignUp = async () => {
     if (!name || !email || !password || !confirmPassword) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      setError('Veuillez remplir tous les champs');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
+      setError('Les mots de passe ne correspondent pas');
       return;
     }
 
     setLoading(true);
+    setError('');
     try {
       await signUp(email.trim(), password, name.trim());
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erreur lors de l\'inscription';
-      Alert.alert('Erreur', message);
+      const message = error instanceof Error ? error.message : 'Erreur de connexion';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -80,6 +82,12 @@ export const RegisterForm = () => {
           autoCapitalize="none"
         />
       </View>
+
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
 
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
@@ -134,5 +142,17 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  errorContainer: {
+    backgroundColor: '#FEE',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftColor: '#F44336',
+  },
+  errorText: {
+    color: '#D32F2F',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

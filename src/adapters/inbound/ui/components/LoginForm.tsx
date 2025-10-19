@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import { useAuth } from "@/src/adapters/inbound/ui/hooks";
 
@@ -8,19 +8,21 @@ export const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      setError('Veuillez remplir tous les champs');
       return;
     }
 
     setLoading(true);
+    setError('');
     try {
       await signIn(email.trim(), password);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erreur de connexion';
-      Alert.alert('Erreur', message);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -32,7 +34,7 @@ export const LoginForm = () => {
         <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
-          placeholder="votre@email.com"
+          placeholder="email@example.com"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -44,13 +46,19 @@ export const LoginForm = () => {
         <Text style={styles.label}>Mot de passe</Text>
         <TextInput
           style={styles.input}
-          placeholder="••••••••"
+          placeholder="Mot de passe"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           autoCapitalize="none"
         />
       </View>
+
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
 
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
@@ -105,5 +113,17 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  errorContainer: {
+    backgroundColor: '#FEE',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftColor: '#F44336',
+  },
+  errorText: {
+    color: '#D32F2F',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
