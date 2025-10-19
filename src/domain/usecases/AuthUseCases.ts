@@ -28,11 +28,9 @@ export class AuthUseCases implements AuthUseCasePort {
       throw new Error('Tokens manquants dans la réponse');
     }
 
-    // Stockage des tokens
     await this.storagePort.saveSecure(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
     await this.storagePort.saveSecure(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
 
-    // Stockage des infos utilisateur
     await this.storagePort.save(STORAGE_KEYS.USER, JSON.stringify({
       id: user.id,
       email: user.email,
