@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from "expo-router";
 import { RegisterForm } from "@/src/adapters/inbound/ui/components/RegisterForm";
 
-export default function RegisterScreen() {
+export default function RegisterScreen () {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -24,9 +24,7 @@ export default function RegisterScreen() {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Pas encore de compte ?</Text>
-            <TouchableOpacity
-              onPress={() => router.push('/login')}
-            >
+            <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
               <Text style={styles.link}>S&apos;inscrire</Text>
             </TouchableOpacity>
           </View>

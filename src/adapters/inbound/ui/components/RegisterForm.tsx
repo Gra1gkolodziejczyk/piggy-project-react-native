@@ -1,4 +1,4 @@
-import {ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import React, {useState} from "react";
 import { useAuth } from "@/src/adapters/inbound/ui/hooks";
 
