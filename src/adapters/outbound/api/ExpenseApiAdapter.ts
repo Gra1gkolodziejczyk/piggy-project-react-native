@@ -54,15 +54,22 @@ export class ExpenseApiAdapter implements ExpensePort {
 
   async createExpense(data: CreateExpenseData): Promise<Expense> {
     try {
-      const response = await this.httpClient.post<BackendExpenseResponse>('/expenses', {
+      const body: any = {
         name: data.name,
         amount: data.amount,
         category: data.category,
         description: data.description || '',
         frequency: data.frequency,
         isRecurring: data.isRecurring,
-        nextPaymentDate: data.nextPaymentDate?.toISOString(),
-      });
+      };
+
+      if (data.nextPaymentDate) {
+        const normalizedDate = new Date(data.nextPaymentDate);
+        normalizedDate.setUTCHours(0, 0, 0, 0);
+        body.nextPaymentDate = normalizedDate.toISOString();
+      }
+
+      const response = await this.httpClient.post<BackendExpenseResponse>('/expenses', body);
 
       return new Expense(
         response.id,
@@ -83,7 +90,6 @@ export class ExpenseApiAdapter implements ExpensePort {
         response.archivedAt ? new Date(response.archivedAt) : null
       );
     } catch (error) {
-      console.error('Erreur lors de la création de la dépense:', error);
       throw new Error('Impossible de créer la dépense');
     }
   }

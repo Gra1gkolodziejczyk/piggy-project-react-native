@@ -44,6 +44,7 @@ export function useFinance() {
     category: string,
     frequency: 'once' | 'weekly' | 'monthly' | 'yearly',
     isRecurring: boolean,
+    nextPaymentDate?: Date,
     description?: string
   ) => {
     if (type === TransactionType.INCOME) {
@@ -53,6 +54,7 @@ export function useFinance() {
         amount,
         frequency: frequency as any,
         isRecurring,
+        nextPaymentDate,
         description,
       });
     } else {
@@ -62,6 +64,7 @@ export function useFinance() {
         category: category as any,
         frequency: frequency as any,
         isRecurring,
+        nextPaymentDate,
         description,
       });
     }

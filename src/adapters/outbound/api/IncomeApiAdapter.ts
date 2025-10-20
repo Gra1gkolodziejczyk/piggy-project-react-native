@@ -43,22 +43,28 @@ export class IncomeApiAdapter implements IncomePort {
         i.archivedAt ? new Date(i.archivedAt) : null
       ));
     } catch (error) {
-      console.error('Erreur lors de la récupération des revenus:', error);
       throw new Error('Impossible de récupérer les revenus');
     }
   }
 
   async createIncome(data: CreateIncomeData): Promise<Income> {
     try {
-      const response = await this.httpClient.post<BackendIncomeResponse>('/incomes', {
+      const body: any = {
         name: data.name,
         type: data.type,
         amount: data.amount,
         frequency: data.frequency,
         isRecurring: data.isRecurring,
-        nextPaymentDate: data.nextPaymentDate?.toISOString(),
         description: data.description || '',
-      });
+      };
+
+      if (data.nextPaymentDate) {
+        const normalizedDate = new Date(data.nextPaymentDate);
+        normalizedDate.setUTCHours(0, 0, 0, 0);
+        body.nextPaymentDate = normalizedDate.toISOString();
+      }
+
+      const response = await this.httpClient.post<BackendIncomeResponse>('/incomes', body);
 
       return new Income(
         response.id,
@@ -77,7 +83,6 @@ export class IncomeApiAdapter implements IncomePort {
         response.archivedAt ? new Date(response.archivedAt) : null
       );
     } catch (error) {
-      console.error('Erreur lors de la création du revenu:', error);
       throw new Error('Impossible de créer le revenu');
     }
   }

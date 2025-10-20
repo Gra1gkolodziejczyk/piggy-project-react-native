@@ -26,6 +26,7 @@ interface AddTransactionModalProps {
     category: string,
     frequency: 'once' | 'weekly' | 'monthly' | 'yearly',
     isRecurring: boolean,
+    nextPaymentDate?: Date,
     description?: string
   ) => Promise<void>;
 }
@@ -53,7 +54,7 @@ const FREQUENCIES = {
   yearly: 'Annuel',
 };
 
-export default function AddTransactionModal({visible, onClose, onSubmit}: AddTransactionModalProps) {
+export default function AddTransactionModal({visible, onClose, onSubmit }: AddTransactionModalProps) {
   const [type, setType] = useState<TransactionType>(TransactionType.EXPENSE);
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
@@ -64,6 +65,40 @@ export default function AddTransactionModal({visible, onClose, onSubmit}: AddTra
   const [isLoading, setIsLoading] = useState(false);
 
   const categories = type === TransactionType.INCOME ? INCOME_TYPES : EXPENSE_CATEGORIES;
+
+  const getNextPaymentDate = (): Date | undefined => {
+    if (!isRecurring) return undefined;
+
+    const now = new Date();
+    const nextDate = new Date(now);
+
+    switch (frequency) {
+      case 'weekly':
+        nextDate.setDate(now.getDate() + 7);
+        break;
+      case 'monthly':
+        nextDate.setMonth(now.getMonth() + 1);
+        break;
+      case 'yearly':
+        nextDate.setFullYear(now.getFullYear() + 1);
+        break;
+      case 'once':
+      default:
+        nextDate.setMonth(now.getMonth() + 1);
+        break;
+    }
+
+    nextDate.setUTCHours(0, 0, 0, 0);
+
+    return nextDate;
+  };
+
+  const handleRecurringToggle = (value: boolean) => {
+    setIsRecurring(value);
+    if (value && frequency === 'once') {
+      setFrequency('monthly');
+    }
+  };
 
   const handleSubmit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -81,8 +116,27 @@ export default function AddTransactionModal({visible, onClose, onSubmit}: AddTra
       return;
     }
 
+    if (isRecurring && frequency === 'once') {
+      Alert.alert('Erreur', 'Une transaction récurrente ne peut pas être "Une fois"');
+      return;
+    }
+
     setIsLoading(true);
     try {
+      const nextPaymentDate = getNextPaymentDate();
+
+      console.log('🔥 AVANT ONSUBMIT - Valeurs brutes:', {
+        name: name.trim(),
+        amount: parseFloat(amount),
+        type,
+        category: selectedCategory,
+        frequency,
+        isRecurring,
+        nextPaymentDate,
+        nextPaymentDateISO: nextPaymentDate?.toISOString(),
+        description: description.trim() || undefined
+      });
+
       await onSubmit(
         name.trim(),
         parseFloat(amount),
@@ -90,6 +144,7 @@ export default function AddTransactionModal({visible, onClose, onSubmit}: AddTra
         selectedCategory,
         frequency,
         isRecurring,
+        nextPaymentDate,
         description.trim() || undefined
       );
 
@@ -103,7 +158,9 @@ export default function AddTransactionModal({visible, onClose, onSubmit}: AddTra
 
       Alert.alert('Succès', 'Transaction ajoutée avec succès');
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible d\'ajouter la transaction');
+      const errorMessage = error instanceof Error ? error.message : 'Impossible d\'ajouter la transaction';
+      Alert.alert('Erreur', errorMessage);
+      console.error('❌ Erreur soumission:', error);
     } finally {
       setIsLoading(false);
     }
@@ -213,7 +270,7 @@ export default function AddTransactionModal({visible, onClose, onSubmit}: AddTra
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Montant</Text>
+              <Text style={styles.label}>Montant (€)</Text>
               <TextInput
                 style={styles.input}
                 placeholder="0.00"
@@ -250,39 +307,59 @@ export default function AddTransactionModal({visible, onClose, onSubmit}: AddTra
               </View>
             </View>
 
+            <View style={styles.switchContainer}>
+              <View>
+                <Text style={styles.label}>Transaction récurrente</Text>
+                {isRecurring && (
+                  <Text style={styles.helperText}>
+                    Prochain paiement calculé automatiquement
+                  </Text>
+                )}
+              </View>
+              <Switch
+                value={isRecurring}
+                onValueChange={handleRecurringToggle}
+                disabled={isLoading}
+                trackColor={{ false: '#E0E0E0', true: '#34C759' }}
+                thumbColor={isRecurring ? '#FFFFFF' : '#F4F3F4'}
+              />
+            </View>
+
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Fréquence</Text>
               <View style={styles.categoriesGrid}>
-                {Object.entries(FREQUENCIES).map(([key, label]) => (
-                  <TouchableOpacity
-                    key={key}
-                    style={[
-                      styles.categoryButton,
-                      frequency === key && styles.categoryButtonActive,
-                    ]}
-                    onPress={() => setFrequency(key as any)}
-                    disabled={isLoading}
-                  >
-                    <Text
-                      style={[
-                        styles.categoryButtonText,
-                        frequency === key && styles.categoryButtonTextActive,
-                      ]}
-                    >
-                      {label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+                {Object.entries(FREQUENCIES).map(([key, label]) => {
+                  const isDisabled = isRecurring && key === 'once';
 
-            <View style={styles.switchContainer}>
-              <Text style={styles.label}>Transaction récurrente</Text>
-              <Switch
-                value={isRecurring}
-                onValueChange={setIsRecurring}
-                disabled={isLoading}
-              />
+                  return (
+                    <TouchableOpacity
+                      key={key}
+                      style={[
+                        styles.categoryButton,
+                        frequency === key && styles.categoryButtonActive,
+                        isDisabled && styles.categoryButtonDisabled,
+                      ]}
+                      onPress={() => setFrequency(key as any)}
+                      disabled={isLoading || isDisabled}
+                    >
+                      <Text
+                        style={[
+                          styles.categoryButtonText,
+                          frequency === key && styles.categoryButtonTextActive,
+                          isDisabled && styles.categoryButtonTextDisabled,
+                        ]}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              {isRecurring && (
+                <Text style={styles.warningText}>
+                  ⚠️ Une transaction récurrente doit être hebdomadaire, mensuelle ou annuelle
+                </Text>
+              )}
             </View>
 
             <View style={styles.inputContainer}>
@@ -389,6 +466,11 @@ const styles = StyleSheet.create({
     color: '#000000',
     marginBottom: 8,
   },
+  helperText: {
+    fontSize: 12,
+    color: '#8E8E93',
+    marginTop: 2,
+  },
   input: {
     height: 50,
     borderWidth: 1,
@@ -434,6 +516,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
+    paddingVertical: 8,
   },
   submitButton: {
     margin: 20,
@@ -450,5 +533,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  categoryButtonDisabled: {
+    opacity: 0.3,
+  },
+  categoryButtonTextDisabled: {
+    color: '#C7C7CC',
+  },
+  warningText: {
+    fontSize: 12,
+    color: '#FF9500',
+    marginTop: 8,
   },
 });
