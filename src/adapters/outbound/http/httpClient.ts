@@ -6,10 +6,15 @@ export interface HttpClientConfig {
 export class HttpClient {
   public readonly baseUrl: string;
   private readonly timeout: number;
+  private tokenProvider?: () => Promise<string | null>;
 
   constructor(config: HttpClientConfig) {
     this.baseUrl = config.baseUrl;
     this.timeout = config.timeout || 30000;
+  }
+
+  setTokenProvider(provider: () => Promise<string | null>) {
+    this.tokenProvider = provider;
   }
 
   private async request<T>(
@@ -22,13 +27,24 @@ export class HttpClient {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (options?.headers) {
+        const customHeaders = options.headers as Record<string, string>;
+        Object.assign(headers, customHeaders);
+      }
+
+      const token = this.tokenProvider ? await this.tokenProvider() : null;
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options?.headers,
-        },
+        headers,
       });
 
       clearTimeout(timeoutId);
@@ -56,53 +72,36 @@ export class HttpClient {
     }
   }
 
-  async get<T>(endpoint: string, token?: string): Promise<T> {
+  async get<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'GET',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   }
 
-  async post<T>(
-    endpoint: string,
-    data?: unknown,
-    token?: string
-  ): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   }
 
-  async put<T>(
-    endpoint: string,
-    data?: unknown,
-    token?: string
-  ): Promise<T> {
+  async put<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   }
 
-  async patch<T>(
-    endpoint: string,
-    data?: unknown,
-    token?: string
-  ): Promise<T> {
+  async patch<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   }
 
-  async delete<T>(endpoint: string, token?: string): Promise<T> {
+  async delete<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'DELETE',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   }
 }
