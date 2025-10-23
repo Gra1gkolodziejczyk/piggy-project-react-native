@@ -74,6 +74,12 @@ export default function AddTransactionModal({
   const categories =
     type === TransactionType.INCOME ? INCOME_TYPES : EXPENSE_CATEGORIES;
 
+  const namePlaceholder =
+    type === TransactionType.INCOME ? "Ex: Salaire mensuel" : "Ex: Courses";
+
+  const nameDescriptionPlaceholder =
+    type === TransactionType.INCOME ? "Ex: Salaire mensuel" : "Ex: Courses";
+
   const getNextPaymentDate = (): Date | undefined => {
     if (!isRecurring) return undefined;
 
@@ -271,10 +277,10 @@ export default function AddTransactionModal({
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Nom</Text>
+              <Text style={styles.label}>Nom <Text style={styles.red}>*</Text></Text>
               <TextInput
                 style={styles.input}
-                placeholder="Ex: Salaire mensuel"
+                placeholder={namePlaceholder}
                 value={name}
                 onChangeText={setName}
                 editable={!isLoading}
@@ -282,7 +288,7 @@ export default function AddTransactionModal({
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Montant (€)</Text>
+              <Text style={styles.label}>Montant (€) <Text style={styles.red}>*</Text></Text>
               <TextInput
                 style={styles.input}
                 placeholder="0.00"
@@ -294,7 +300,7 @@ export default function AddTransactionModal({
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Catégorie</Text>
+              <Text style={styles.label}>Catégorie <Text style={styles.red}>*</Text></Text>
               <View style={styles.categoriesGrid}>
                 {Object.entries(categories).map(([key, label]) => (
                   <TouchableOpacity
@@ -339,7 +345,7 @@ export default function AddTransactionModal({
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Fréquence</Text>
+              <Text style={styles.label}>Fréquence <Text style={styles.red}>*</Text></Text>
               <View style={styles.categoriesGrid}>
                 {Object.entries(FREQUENCIES).map(([key, label]) => {
                   const isDisabled = isRecurring && key === "once";
@@ -377,10 +383,10 @@ export default function AddTransactionModal({
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Description (optionnelle)</Text>
+              <Text style={styles.label}>Description</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
-                placeholder="Ex: Salaire NET de mon emploi principal"
+                placeholder={nameDescriptionPlaceholder}
                 value={description}
                 onChangeText={setDescription}
                 editable={!isLoading}
@@ -562,4 +568,7 @@ const styles = StyleSheet.create({
     color: "#FF9500",
     marginTop: 8,
   },
+  red: {
+    color: "#FF3B30",
+  }
 });
