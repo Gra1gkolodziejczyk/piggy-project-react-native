@@ -355,7 +355,7 @@ export default function AddTransactionModal({
                         frequency === key && styles.categoryButtonActive,
                         isDisabled && styles.categoryButtonDisabled,
                       ]}
-                      onPress={() => setFrequency(key as any)}
+                      onPress={() => setFrequency(key as never)}
                       disabled={isLoading || isDisabled}
                     >
                       <Text

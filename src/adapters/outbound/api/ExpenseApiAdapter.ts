@@ -18,7 +18,7 @@ interface BackendExpenseResponse {
   frequency: string;
   isRecurring: boolean;
   nextPaymentDate: string | null;
-  splitPercentages: any | null;
+  splitPercentages: number | null;
   isActive: boolean;
   isArchived: boolean;
   createdAt: string;

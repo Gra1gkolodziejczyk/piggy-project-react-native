@@ -26,7 +26,7 @@ export class Expense {
     public readonly frequency: Frequency,
     public readonly isRecurring: boolean,
     public readonly nextPaymentDate: Date | null,
-    public readonly splitPercentages: any | null,
+    public readonly splitPercentages: number | null,
     public readonly isActive: boolean,
     public readonly isArchived: boolean,
     public readonly createdAt: Date,
