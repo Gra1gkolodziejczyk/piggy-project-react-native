@@ -1,7 +1,16 @@
-import { Bank } from '../../entities/Bank';
-import { Income, IncomeType, Frequency as IncomeFrequency } from '../../entities/Income';
-import { Expense, ExpenseCategory, Frequency as ExpenseFrequency } from '../../entities/Expense';
-import { Transaction } from '@/src/domain/entities';
+import {
+  Expense,
+  ExpenseCategory,
+  Frequency as ExpenseFrequency,
+} from "../../entities/Expense";
+import {
+  Income,
+  Frequency as IncomeFrequency,
+  IncomeType,
+} from "../../entities/Income";
+
+import { Transaction } from "@/src/domain/entities";
+import { Bank } from "../../entities/Bank";
 
 export interface CreateIncomeCommand {
   name: string;

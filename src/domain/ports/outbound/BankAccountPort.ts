@@ -1,4 +1,4 @@
-import { Bank } from '../../entities/Bank';
+import { Bank } from "../../entities/Bank";
 
 export interface BankAccountPort {
   getBankAccount(): Promise<Bank>;

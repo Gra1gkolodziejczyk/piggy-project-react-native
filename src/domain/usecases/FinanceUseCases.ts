@@ -1,13 +1,14 @@
-import { Bank } from '../entities/Bank';
-import { Income } from '../entities/Income';
-import { Expense } from '../entities/Expense';
-import { Transaction } from '@/src/domain/entities';
-import { BankAccountPort, IncomePort, ExpensePort } from '../ports/outbound';
 import {
-  FinanceUseCasePort,
+  CreateExpenseCommand,
   CreateIncomeCommand,
-  CreateExpenseCommand
-} from '../ports/inbound';
+  FinanceUseCasePort,
+} from "../ports/inbound";
+import { BankAccountPort, ExpensePort, IncomePort } from "../ports/outbound";
+
+import { Transaction } from "@/src/domain/entities";
+import { Bank } from "../entities/Bank";
+import { Expense } from "../entities/Expense";
+import { Income } from "../entities/Income";
 
 export class FinanceUseCases implements FinanceUseCasePort {
   constructor(
@@ -22,14 +23,17 @@ export class FinanceUseCases implements FinanceUseCasePort {
 
   async addBalanceManually(amount: number, description: string): Promise<Bank> {
     if (amount <= 0) {
-      throw new Error('Le montant doit être positif');
+      throw new Error("Le montant doit être positif");
     }
     return await this.bankAccountPort.addBalance(amount, description);
   }
 
-  async subtractBalanceManually(amount: number, description: string): Promise<Bank> {
+  async subtractBalanceManually(
+    amount: number,
+    description: string
+  ): Promise<Bank> {
     if (amount <= 0) {
-      throw new Error('Le montant doit être positif');
+      throw new Error("Le montant doit être positif");
     }
     return await this.bankAccountPort.subtractBalance(amount, description);
   }
@@ -44,8 +48,8 @@ export class FinanceUseCases implements FinanceUseCasePort {
       this.expensePort.getExpenses(),
     ]);
 
-    const incomeTransactions = incomes.map(i => Transaction.fromIncome(i));
-    const expenseTransactions = expenses.map(e => Transaction.fromExpense(e));
+    const incomeTransactions = incomes.map((i) => Transaction.fromIncome(i));
+    const expenseTransactions = expenses.map((e) => Transaction.fromExpense(e));
 
     const allTransactions = [...incomeTransactions, ...expenseTransactions];
     allTransactions.sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -55,11 +59,11 @@ export class FinanceUseCases implements FinanceUseCasePort {
 
   async createIncome(command: CreateIncomeCommand): Promise<Income> {
     if (command.amount <= 0) {
-      throw new Error('Le montant doit être positif');
+      throw new Error("Le montant doit être positif");
     }
 
     if (!command.name || command.name.trim().length === 0) {
-      throw new Error('Le nom est requis');
+      throw new Error("Le nom est requis");
     }
 
     return await this.incomePort.createIncome({
@@ -79,11 +83,11 @@ export class FinanceUseCases implements FinanceUseCasePort {
 
   async createExpense(command: CreateExpenseCommand): Promise<Expense> {
     if (command.amount <= 0) {
-      throw new Error('Le montant doit être positif');
+      throw new Error("Le montant doit être positif");
     }
 
     if (!command.name || command.name.trim().length === 0) {
-      throw new Error('Le nom est requis');
+      throw new Error("Le nom est requis");
     }
 
     return await this.expensePort.createExpense({
@@ -108,7 +112,7 @@ export class FinanceUseCases implements FinanceUseCasePort {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    const monthlyTransactions = transactions.filter(t => {
+    const monthlyTransactions = transactions.filter((t) => {
       const transactionDate = new Date(t.date);
       return (
         transactionDate.getMonth() === currentMonth &&
@@ -117,11 +121,11 @@ export class FinanceUseCases implements FinanceUseCasePort {
     });
 
     const incomes = monthlyTransactions
-      .filter(t => t.type === 'income')
+      .filter((t) => t.type === "income")
       .reduce((sum, t) => sum + t.amount, 0);
 
     const expenses = monthlyTransactions
-      .filter(t => t.type === 'expense')
+      .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + t.amount, 0);
 
     return { incomes, expenses };

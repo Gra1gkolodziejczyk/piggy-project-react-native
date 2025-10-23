@@ -1,9 +1,9 @@
-import { Income } from './Income';
-import { Expense } from './Expense';
+import { Expense } from "./Expense";
+import { Income } from "./Income";
 
 export enum TransactionType {
-  INCOME = 'income',
-  EXPENSE = 'expense',
+  INCOME = "income",
+  EXPENSE = "expense",
 }
 
 export class Transaction {
@@ -39,9 +39,9 @@ export class Transaction {
   }
 
   formatAmount(): string {
-    const formatted = new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
+    const formatted = new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
     }).format(Math.abs(this.amount));
 
     return this.type === TransactionType.INCOME
@@ -50,10 +50,10 @@ export class Transaction {
   }
 
   getIcon(): string {
-    return this.type === TransactionType.INCOME ? '↗️' : '↘️';
+    return this.type === TransactionType.INCOME ? "↗️" : "↘️";
   }
 
   getColor(): string {
-    return this.type === TransactionType.INCOME ? '#34C759' : '#FF3B30';
+    return this.type === TransactionType.INCOME ? "#34C759" : "#FF3B30";
   }
 }

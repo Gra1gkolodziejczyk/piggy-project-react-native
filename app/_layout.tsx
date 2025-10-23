@@ -1,7 +1,8 @@
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AuthProvider, useAuth } from '@/src/infrastructure/providers';
-import { useEffect } from 'react';
+import { AuthProvider, useAuth } from "@/src/infrastructure/providers";
+import { Stack, useRouter, useSegments } from "expo-router";
+
+import { useEffect } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 function RootLayoutNav() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -11,12 +12,12 @@ function RootLayoutNav() {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
+    const inAuthGroup = segments[0] === "(auth)";
 
     if (isAuthenticated && inAuthGroup) {
-      router.replace('/');
+      router.replace("/");
     } else if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/login');
+      router.replace("/login");
     }
   }, [isAuthenticated, segments, isLoading, router]);
 

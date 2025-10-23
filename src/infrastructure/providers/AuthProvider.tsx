@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { User } from '../../domain/entities';
-import { authUseCases } from '../config';
+import React, { ReactNode, createContext, useEffect, useState } from "react";
+
+import { User } from "../../domain/entities";
+import { authUseCases } from "../config";
 
 interface AuthContextValue {
   user: User | null;
@@ -39,7 +40,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const currentUser = await authUseCases.getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      console.error('Erreur lors de la vérification de l\'authentification:', error);
+      console.error(
+        "Erreur lors de la vérification de l'authentification:",
+        error
+      );
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -78,7 +82,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await authUseCases.signOut();
       setUser(null);
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      console.error("Erreur lors de la déconnexion:", error);
       setUser(null);
     } finally {
       setIsLoading(false);

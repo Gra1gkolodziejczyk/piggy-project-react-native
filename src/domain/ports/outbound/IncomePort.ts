@@ -1,4 +1,4 @@
-import { Income, IncomeType, Frequency } from '../../entities/Income';
+import { Frequency, Income, IncomeType } from "../../entities/Income";
 
 export interface CreateIncomeData {
   name: string;

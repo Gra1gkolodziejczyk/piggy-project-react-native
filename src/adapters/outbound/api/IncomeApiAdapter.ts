@@ -1,6 +1,7 @@
-import { IncomePort, CreateIncomeData } from '@/src/domain/ports/outbound';
-import { Income, IncomeType, Frequency } from '@/src/domain/entities/Income';
-import { HttpClient } from '../http/httpClient';
+import { Frequency, Income, IncomeType } from "@/src/domain/entities/Income";
+import { CreateIncomeData, IncomePort } from "@/src/domain/ports/outbound";
+
+import { HttpClient } from "../http/httpClient";
 
 interface BackendIncomeResponse {
   id: string;
@@ -24,26 +25,31 @@ export class IncomeApiAdapter implements IncomePort {
 
   async getIncomes(): Promise<Income[]> {
     try {
-      const response = await this.httpClient.get<BackendIncomeResponse[]>('/incomes');
+      const response = await this.httpClient.get<BackendIncomeResponse[]>(
+        "/incomes"
+      );
 
-      return response.map(i => new Income(
-        i.id,
-        i.userId,
-        i.name,
-        i.type as IncomeType,
-        parseFloat(i.amount),
-        i.frequency as Frequency,
-        i.isRecurring,
-        i.nextPaymentDate ? new Date(i.nextPaymentDate) : null,
-        i.isActive,
-        i.isArchived,
-        i.description,
-        new Date(i.createdAt),
-        new Date(i.updatedAt),
-        i.archivedAt ? new Date(i.archivedAt) : null
-      ));
+      return response.map(
+        (i) =>
+          new Income(
+            i.id,
+            i.userId,
+            i.name,
+            i.type as IncomeType,
+            parseFloat(i.amount),
+            i.frequency as Frequency,
+            i.isRecurring,
+            i.nextPaymentDate ? new Date(i.nextPaymentDate) : null,
+            i.isActive,
+            i.isArchived,
+            i.description,
+            new Date(i.createdAt),
+            new Date(i.updatedAt),
+            i.archivedAt ? new Date(i.archivedAt) : null
+          )
+      );
     } catch (error) {
-      throw new Error('Impossible de récupérer les revenus');
+      throw new Error("Impossible de récupérer les revenus");
     }
   }
 
@@ -55,7 +61,7 @@ export class IncomeApiAdapter implements IncomePort {
         amount: data.amount,
         frequency: data.frequency,
         isRecurring: data.isRecurring,
-        description: data.description || '',
+        description: data.description || "",
       };
 
       if (data.nextPaymentDate) {
@@ -64,7 +70,10 @@ export class IncomeApiAdapter implements IncomePort {
         body.nextPaymentDate = normalizedDate.toISOString();
       }
 
-      const response = await this.httpClient.post<BackendIncomeResponse>('/incomes', body);
+      const response = await this.httpClient.post<BackendIncomeResponse>(
+        "/incomes",
+        body
+      );
 
       return new Income(
         response.id,
@@ -83,7 +92,7 @@ export class IncomeApiAdapter implements IncomePort {
         response.archivedAt ? new Date(response.archivedAt) : null
       );
     } catch (error) {
-      throw new Error('Impossible de créer le revenu');
+      throw new Error("Impossible de créer le revenu");
     }
   }
 
@@ -91,8 +100,8 @@ export class IncomeApiAdapter implements IncomePort {
     try {
       await this.httpClient.delete(`/incomes/${incomeId}`);
     } catch (error) {
-      console.error('Erreur lors de la suppression du revenu:', error);
-      throw new Error('Impossible de supprimer le revenu');
+      console.error("Erreur lors de la suppression du revenu:", error);
+      throw new Error("Impossible de supprimer le revenu");
     }
   }
 }

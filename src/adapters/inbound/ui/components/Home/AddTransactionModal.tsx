@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  TextInput,
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
-  ActivityIndicator,
+  StyleSheet,
   Switch,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { TransactionType } from '@/src/domain/entities';
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+import { TransactionType } from "@/src/domain/entities";
+import { Ionicons } from "@expo/vector-icons";
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -24,7 +25,7 @@ interface AddTransactionModalProps {
     amount: number,
     type: TransactionType,
     category: string,
-    frequency: 'once' | 'weekly' | 'monthly' | 'yearly',
+    frequency: "once" | "weekly" | "monthly" | "yearly",
     isRecurring: boolean,
     nextPaymentDate?: Date,
     description?: string
@@ -32,39 +33,46 @@ interface AddTransactionModalProps {
 }
 
 const INCOME_TYPES = {
-  salary: 'Salaire',
-  freelance: 'Freelance',
-  investment: 'Investissement',
-  other: 'Autre',
+  salary: "Salaire",
+  freelance: "Freelance",
+  investment: "Investissement",
+  other: "Autre",
 };
 
 const EXPENSE_CATEGORIES = {
-  groceries: 'Alimentation',
-  transport: 'Transport',
-  housing: 'Logement',
-  entertainment: 'Loisirs',
-  health: 'Santé',
-  other: 'Autre',
+  groceries: "Alimentation",
+  transport: "Transport",
+  housing: "Logement",
+  entertainment: "Loisirs",
+  health: "Santé",
+  other: "Autre",
 };
 
 const FREQUENCIES = {
-  once: 'Une fois',
-  weekly: 'Hebdomadaire',
-  monthly: 'Mensuel',
-  yearly: 'Annuel',
+  once: "Une fois",
+  weekly: "Hebdomadaire",
+  monthly: "Mensuel",
+  yearly: "Annuel",
 };
 
-export default function AddTransactionModal({visible, onClose, onSubmit }: AddTransactionModalProps) {
+export default function AddTransactionModal({
+  visible,
+  onClose,
+  onSubmit,
+}: AddTransactionModalProps) {
   const [type, setType] = useState<TransactionType>(TransactionType.EXPENSE);
-  const [name, setName] = useState('');
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [frequency, setFrequency] = useState<'once' | 'weekly' | 'monthly' | 'yearly'>('once');
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [frequency, setFrequency] = useState<
+    "once" | "weekly" | "monthly" | "yearly"
+  >("once");
   const [isRecurring, setIsRecurring] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const categories = type === TransactionType.INCOME ? INCOME_TYPES : EXPENSE_CATEGORIES;
+  const categories =
+    type === TransactionType.INCOME ? INCOME_TYPES : EXPENSE_CATEGORIES;
 
   const getNextPaymentDate = (): Date | undefined => {
     if (!isRecurring) return undefined;
@@ -73,16 +81,16 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
     const nextDate = new Date(now);
 
     switch (frequency) {
-      case 'weekly':
+      case "weekly":
         nextDate.setDate(now.getDate() + 7);
         break;
-      case 'monthly':
+      case "monthly":
         nextDate.setMonth(now.getMonth() + 1);
         break;
-      case 'yearly':
+      case "yearly":
         nextDate.setFullYear(now.getFullYear() + 1);
         break;
-      case 'once':
+      case "once":
       default:
         nextDate.setMonth(now.getMonth() + 1);
         break;
@@ -95,47 +103,38 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
 
   const handleRecurringToggle = (value: boolean) => {
     setIsRecurring(value);
-    if (value && frequency === 'once') {
-      setFrequency('monthly');
+    if (value && frequency === "once") {
+      setFrequency("monthly");
     }
   };
 
   const handleSubmit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Erreur', 'Veuillez entrer un montant valide');
+      Alert.alert("Erreur", "Veuillez entrer un montant valide");
       return;
     }
 
     if (!name.trim()) {
-      Alert.alert('Erreur', 'Veuillez entrer un nom');
+      Alert.alert("Erreur", "Veuillez entrer un nom");
       return;
     }
 
     if (!selectedCategory) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une catégorie');
+      Alert.alert("Erreur", "Veuillez sélectionner une catégorie");
       return;
     }
 
-    if (isRecurring && frequency === 'once') {
-      Alert.alert('Erreur', 'Une transaction récurrente ne peut pas être "Une fois"');
+    if (isRecurring && frequency === "once") {
+      Alert.alert(
+        "Erreur",
+        'Une transaction récurrente ne peut pas être "Une fois"'
+      );
       return;
     }
 
     setIsLoading(true);
     try {
       const nextPaymentDate = getNextPaymentDate();
-
-      console.log('🔥 AVANT ONSUBMIT - Valeurs brutes:', {
-        name: name.trim(),
-        amount: parseFloat(amount),
-        type,
-        category: selectedCategory,
-        frequency,
-        isRecurring,
-        nextPaymentDate,
-        nextPaymentDateISO: nextPaymentDate?.toISOString(),
-        description: description.trim() || undefined
-      });
 
       await onSubmit(
         name.trim(),
@@ -148,19 +147,22 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
         description.trim() || undefined
       );
 
-      setName('');
-      setAmount('');
-      setDescription('');
-      setSelectedCategory('');
-      setFrequency('once');
+      setName("");
+      setAmount("");
+      setDescription("");
+      setSelectedCategory("");
+      setFrequency("once");
       setIsRecurring(false);
       onClose();
 
-      Alert.alert('Succès', 'Transaction ajoutée avec succès');
+      Alert.alert("Succès", "Transaction ajoutée avec succès");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Impossible d\'ajouter la transaction';
-      Alert.alert('Erreur', errorMessage);
-      console.error('❌ Erreur soumission:', error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Impossible d'ajouter la transaction";
+      Alert.alert("Erreur", errorMessage);
+      console.error("❌ Erreur soumission:", error);
     } finally {
       setIsLoading(false);
     }
@@ -168,11 +170,11 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
 
   const handleClose = () => {
     if (!isLoading) {
-      setName('');
-      setAmount('');
-      setDescription('');
-      setSelectedCategory('');
-      setFrequency('once');
+      setName("");
+      setAmount("");
+      setDescription("");
+      setSelectedCategory("");
+      setFrequency("once");
       setIsRecurring(false);
       onClose();
     }
@@ -187,7 +189,7 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
     >
       <KeyboardAvoidingView
         style={styles.overlay}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <TouchableOpacity
           style={styles.backdrop}
@@ -203,7 +205,10 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.typeSelector}>
               <TouchableOpacity
                 style={[
@@ -212,19 +217,22 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
                 ]}
                 onPress={() => {
                   setType(TransactionType.EXPENSE);
-                  setSelectedCategory('');
+                  setSelectedCategory("");
                 }}
                 disabled={isLoading}
               >
                 <Ionicons
                   name="arrow-down-circle"
                   size={24}
-                  color={type === TransactionType.EXPENSE ? '#FFFFFF' : '#FF3B30'}
+                  color={
+                    type === TransactionType.EXPENSE ? "#FFFFFF" : "#FF3B30"
+                  }
                 />
                 <Text
                   style={[
                     styles.typeButtonText,
-                    type === TransactionType.EXPENSE && styles.typeButtonTextActive,
+                    type === TransactionType.EXPENSE &&
+                      styles.typeButtonTextActive,
                   ]}
                 >
                   Dépense
@@ -234,23 +242,27 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
               <TouchableOpacity
                 style={[
                   styles.typeButton,
-                  type === TransactionType.INCOME && styles.typeButtonActiveIncome,
+                  type === TransactionType.INCOME &&
+                    styles.typeButtonActiveIncome,
                 ]}
                 onPress={() => {
                   setType(TransactionType.INCOME);
-                  setSelectedCategory('');
+                  setSelectedCategory("");
                 }}
                 disabled={isLoading}
               >
                 <Ionicons
                   name="arrow-up-circle"
                   size={24}
-                  color={type === TransactionType.INCOME ? '#FFFFFF' : '#34C759'}
+                  color={
+                    type === TransactionType.INCOME ? "#FFFFFF" : "#34C759"
+                  }
                 />
                 <Text
                   style={[
                     styles.typeButtonText,
-                    type === TransactionType.INCOME && styles.typeButtonTextActive,
+                    type === TransactionType.INCOME &&
+                      styles.typeButtonTextActive,
                   ]}
                 >
                   Revenu
@@ -297,7 +309,8 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
                     <Text
                       style={[
                         styles.categoryButtonText,
-                        selectedCategory === key && styles.categoryButtonTextActive,
+                        selectedCategory === key &&
+                          styles.categoryButtonTextActive,
                       ]}
                     >
                       {label}
@@ -320,8 +333,8 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
                 value={isRecurring}
                 onValueChange={handleRecurringToggle}
                 disabled={isLoading}
-                trackColor={{ false: '#E0E0E0', true: '#34C759' }}
-                thumbColor={isRecurring ? '#FFFFFF' : '#F4F3F4'}
+                trackColor={{ false: "#E0E0E0", true: "#34C759" }}
+                thumbColor={isRecurring ? "#FFFFFF" : "#F4F3F4"}
               />
             </View>
 
@@ -329,7 +342,7 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
               <Text style={styles.label}>Fréquence</Text>
               <View style={styles.categoriesGrid}>
                 {Object.entries(FREQUENCIES).map(([key, label]) => {
-                  const isDisabled = isRecurring && key === 'once';
+                  const isDisabled = isRecurring && key === "once";
 
                   return (
                     <TouchableOpacity
@@ -357,7 +370,8 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
               </View>
               {isRecurring && (
                 <Text style={styles.warningText}>
-                  ⚠️ Une transaction récurrente doit être hebdomadaire, mensuelle ou annuelle
+                  ⚠️ Une transaction récurrente doit être hebdomadaire,
+                  mensuelle ou annuelle
                 </Text>
               )}
             </View>
@@ -377,7 +391,10 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
           </ScrollView>
 
           <TouchableOpacity
-            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
+            style={[
+              styles.submitButton,
+              isLoading && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit}
             disabled={isLoading}
           >
@@ -396,99 +413,99 @@ export default function AddTransactionModal({visible, onClose, onSubmit }: AddTr
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '90%',
+    maxHeight: "90%",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
+    borderBottomColor: "#F2F2F7",
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000000',
+    fontWeight: "bold",
+    color: "#000000",
   },
   content: {
     padding: 20,
   },
   typeSelector: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginBottom: 24,
   },
   typeButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
     padding: 16,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#F2F2F7',
-    backgroundColor: '#FFFFFF',
+    borderColor: "#F2F2F7",
+    backgroundColor: "#FFFFFF",
   },
   typeButtonActive: {
-    backgroundColor: '#FF3B30',
-    borderColor: '#FF3B30',
+    backgroundColor: "#FF3B30",
+    borderColor: "#FF3B30",
   },
   typeButtonActiveIncome: {
-    backgroundColor: '#34C759',
-    borderColor: '#34C759',
+    backgroundColor: "#34C759",
+    borderColor: "#34C759",
   },
   typeButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: "600",
+    color: "#000000",
   },
   typeButtonTextActive: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: "600",
+    color: "#000000",
     marginBottom: 8,
   },
   helperText: {
     fontSize: 12,
-    color: '#8E8E93',
+    color: "#8E8E93",
     marginTop: 2,
   },
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#F9F9F9',
-    color: '#000000',
+    backgroundColor: "#F9F9F9",
+    color: "#000000",
   },
   textArea: {
     height: 80,
     paddingTop: 12,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   categoriesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   categoryButton: {
@@ -496,53 +513,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
+    borderColor: "#E0E0E0",
+    backgroundColor: "#FFFFFF",
   },
   categoryButtonActive: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: "#007AFF",
+    borderColor: "#007AFF",
   },
   categoryButtonText: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#000000',
+    fontWeight: "500",
+    color: "#000000",
   },
   categoryButtonTextActive: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
     paddingVertical: 8,
   },
   submitButton: {
     margin: 20,
     height: 56,
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   submitButtonDisabled: {
     opacity: 0.6,
   },
   submitButtonText: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   categoryButtonDisabled: {
     opacity: 0.3,
   },
   categoryButtonTextDisabled: {
-    color: '#C7C7CC',
+    color: "#C7C7CC",
   },
   warningText: {
     fontSize: 12,
-    color: '#FF9500',
+    color: "#FF9500",
     marginTop: 8,
   },
 });

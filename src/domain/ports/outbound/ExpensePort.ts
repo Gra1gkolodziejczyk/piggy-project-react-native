@@ -1,4 +1,4 @@
-import { Expense, ExpenseCategory, Frequency } from '../../entities/Expense';
+import { Expense, ExpenseCategory, Frequency } from "../../entities/Expense";
 
 export interface CreateExpenseData {
   name: string;

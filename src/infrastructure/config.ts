@@ -1,15 +1,15 @@
-import { HttpClient } from '../adapters/outbound/http/httpClient';
-import { AuthApiAdapter } from '../adapters/outbound/api/AuthApiAdapter';
-import { BankApiAdapter } from '../adapters/outbound/api/BankApiAdapter';
-import { IncomeApiAdapter } from '../adapters/outbound/api/IncomeApiAdapter';
-import { ExpenseApiAdapter } from '../adapters/outbound/api/ExpenseApiAdapter';
-import { SecureStorageAdapter } from '@/src/adapters/outbound/storage';
-import { AuthUseCases } from '@/src/domain/usecases';
-import { FinanceUseCases } from '../domain/usecases/FinanceUseCases';
+import { SecureStorageAdapter } from "@/src/adapters/outbound/storage";
+import { AuthUseCases } from "@/src/domain/usecases";
+import { AuthApiAdapter } from "../adapters/outbound/api/AuthApiAdapter";
+import { BankApiAdapter } from "../adapters/outbound/api/BankApiAdapter";
+import { ExpenseApiAdapter } from "../adapters/outbound/api/ExpenseApiAdapter";
+import { IncomeApiAdapter } from "../adapters/outbound/api/IncomeApiAdapter";
+import { HttpClient } from "../adapters/outbound/http/httpClient";
+import { FinanceUseCases } from "../domain/usecases/FinanceUseCases";
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
 
-console.log('API_BASE_URL:', API_BASE_URL);
+console.log("API_BASE_URL:", API_BASE_URL);
 
 export const httpClient = new HttpClient({
   baseUrl: API_BASE_URL,

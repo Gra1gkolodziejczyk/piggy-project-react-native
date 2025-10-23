@@ -1,1 +1,1 @@
-export * from './SecureStorageAdapter';
+export * from "./SecureStorageAdapter";

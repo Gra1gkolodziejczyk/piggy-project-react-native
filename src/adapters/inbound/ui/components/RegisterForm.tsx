@@ -1,34 +1,43 @@
-import {ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
-import React, {useState} from "react";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
 import { useAuth } from "@/src/adapters/inbound/ui/hooks";
 
 export const RegisterForm = () => {
   const { signUp } = useAuth();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSignUp = async () => {
     if (!name || !email || !password || !confirmPassword) {
-      setError('Veuillez remplir tous les champs');
+      setError("Veuillez remplir tous les champs");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
+      setError("Les mots de passe ne correspondent pas");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
     try {
       await signUp(email.trim(), password, name.trim());
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erreur de connexion';
+      const message =
+        error instanceof Error ? error.message : "Erreur de connexion";
       setError(message);
     } finally {
       setLoading(false);
@@ -101,8 +110,8 @@ export const RegisterForm = () => {
         )}
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   form: {
@@ -113,46 +122,46 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: "600",
+    color: "#000000",
     marginBottom: 8,
   },
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#F9F9F9',
-    color: '#000000',
+    backgroundColor: "#F9F9F9",
+    color: "#000000",
   },
   button: {
     height: 50,
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 24,
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   errorContainer: {
-    backgroundColor: '#FEE',
+    backgroundColor: "#FEE",
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
-    borderLeftColor: '#F44336',
+    borderLeftColor: "#F44336",
   },
   errorText: {
-    color: '#D32F2F',
+    color: "#D32F2F",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

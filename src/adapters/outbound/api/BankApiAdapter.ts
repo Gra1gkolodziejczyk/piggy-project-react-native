@@ -1,6 +1,6 @@
-import { BankAccountPort } from '@/src/domain/ports/outbound';
-import { Bank } from '@/src/domain/entities';
-import { HttpClient } from '../http/httpClient';
+import { Bank } from "@/src/domain/entities";
+import { BankAccountPort } from "@/src/domain/ports/outbound";
+import { HttpClient } from "../http/httpClient";
 
 interface BackendBankResponse {
   id: string;
@@ -16,7 +16,7 @@ export class BankApiAdapter implements BankAccountPort {
 
   async getBankAccount(): Promise<Bank> {
     try {
-      const response = await this.httpClient.get<BackendBankResponse>('/banks');
+      const response = await this.httpClient.get<BackendBankResponse>("/banks");
 
       return new Bank(
         response.id,
@@ -27,15 +27,15 @@ export class BankApiAdapter implements BankAccountPort {
         new Date(response.createdAt)
       );
     } catch (error) {
-      console.error('Erreur lors de la récupération du compte:', error);
-      throw new Error('Impossible de récupérer les données bancaires');
+      console.error("Erreur lors de la récupération du compte:", error);
+      throw new Error("Impossible de récupérer les données bancaires");
     }
   }
 
   async addBalance(amount: number, description: string): Promise<Bank> {
     try {
       const response = await this.httpClient.patch<BackendBankResponse>(
-        '/banks/balance/add',
+        "/banks/balance/add",
         { amount, description }
       );
 
@@ -48,15 +48,15 @@ export class BankApiAdapter implements BankAccountPort {
         new Date(response.createdAt)
       );
     } catch (error) {
-      console.error('Erreur lors de l\'ajout au solde:', error);
-      throw new Error('Impossible d\'ajouter au solde');
+      console.error("Erreur lors de l'ajout au solde:", error);
+      throw new Error("Impossible d'ajouter au solde");
     }
   }
 
   async subtractBalance(amount: number, description: string): Promise<Bank> {
     try {
       const response = await this.httpClient.patch<BackendBankResponse>(
-        '/banks/balance/subtract',
+        "/banks/balance/subtract",
         { amount, description }
       );
 
@@ -69,15 +69,15 @@ export class BankApiAdapter implements BankAccountPort {
         new Date(response.createdAt)
       );
     } catch (error) {
-      console.error('Erreur lors du retrait du solde:', error);
-      throw new Error('Impossible de retirer du solde');
+      console.error("Erreur lors du retrait du solde:", error);
+      throw new Error("Impossible de retirer du solde");
     }
   }
 
   async updateCurrency(currency: string): Promise<Bank> {
     try {
       const response = await this.httpClient.patch<BackendBankResponse>(
-        '/banks/currency',
+        "/banks/currency",
         { currency }
       );
 
@@ -90,8 +90,8 @@ export class BankApiAdapter implements BankAccountPort {
         new Date(response.createdAt)
       );
     } catch (error) {
-      console.error('Erreur lors du changement de devise:', error);
-      throw new Error('Impossible de changer la devise');
+      console.error("Erreur lors du changement de devise:", error);
+      throw new Error("Impossible de changer la devise");
     }
   }
 }

@@ -1,22 +1,26 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Transaction } from '@/src/domain/entities';
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+import { Transaction } from "@/src/domain/entities";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
 
 interface TransactionCardProps {
   transaction: Transaction;
   onPress?: () => void;
 }
 
-export default function TransactionCard({ transaction, onPress }: TransactionCardProps) {
-  const isIncome = transaction.type === 'income';
-  const iconName = isIncome ? 'arrow-up-circle' : 'arrow-down-circle';
+export default function TransactionCard({
+  transaction,
+  onPress,
+}: TransactionCardProps) {
+  const isIncome = transaction.type === "income";
+  const iconName = isIncome ? "arrow-up-circle" : "arrow-down-circle";
   const amountColor = isIncome ? styles.incomeAmount : styles.expenseAmount;
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('fr-FR', {
-      day: '2-digit',
-      month: 'short',
+    return new Intl.DateTimeFormat("fr-FR", {
+      day: "2-digit",
+      month: "short",
     }).format(date);
   };
 
@@ -26,8 +30,17 @@ export default function TransactionCard({ transaction, onPress }: TransactionCar
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={[styles.iconContainer, isIncome ? styles.incomeIcon : styles.expenseIcon]}>
-        <Ionicons name={iconName} size={24} color={isIncome ? '#34C759' : '#FF3B30'} />
+      <View
+        style={[
+          styles.iconContainer,
+          isIncome ? styles.incomeIcon : styles.expenseIcon,
+        ]}
+      >
+        <Ionicons
+          name={iconName}
+          size={24}
+          color={isIncome ? "#34C759" : "#FF3B30"}
+        />
       </View>
 
       <View style={styles.content}>
@@ -50,12 +63,12 @@ export default function TransactionCard({ transaction, onPress }: TransactionCar
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     padding: 16,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -65,51 +78,51 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   incomeIcon: {
-    backgroundColor: '#E8F8EC',
+    backgroundColor: "#E8F8EC",
   },
   expenseIcon: {
-    backgroundColor: '#FFE8E6',
+    backgroundColor: "#FFE8E6",
   },
   content: {
     flex: 1,
   },
   description: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: "600",
+    color: "#000000",
     marginBottom: 4,
   },
   metaContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   category: {
     fontSize: 13,
-    color: '#8E8E93',
+    color: "#8E8E93",
   },
   separator: {
     fontSize: 13,
-    color: '#8E8E93',
+    color: "#8E8E93",
     marginHorizontal: 6,
   },
   date: {
     fontSize: 13,
-    color: '#8E8E93',
+    color: "#8E8E93",
   },
   amount: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 12,
   },
   incomeAmount: {
-    color: '#34C759',
+    color: "#34C759",
   },
   expenseAmount: {
-    color: '#FF3B30',
+    color: "#FF3B30",
   },
 });

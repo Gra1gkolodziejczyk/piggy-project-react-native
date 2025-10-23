@@ -1,6 +1,11 @@
-import { ExpensePort, CreateExpenseData } from '@/src/domain/ports/outbound';
-import { Expense, ExpenseCategory, Frequency } from '@/src/domain/entities/Expense';
-import { HttpClient } from '../http/httpClient';
+import {
+  Expense,
+  ExpenseCategory,
+  Frequency,
+} from "@/src/domain/entities/Expense";
+import { CreateExpenseData, ExpensePort } from "@/src/domain/ports/outbound";
+
+import { HttpClient } from "../http/httpClient";
 
 interface BackendExpenseResponse {
   id: string;
@@ -26,29 +31,34 @@ export class ExpenseApiAdapter implements ExpensePort {
 
   async getExpenses(): Promise<Expense[]> {
     try {
-      const response = await this.httpClient.get<BackendExpenseResponse[]>('/expenses');
+      const response = await this.httpClient.get<BackendExpenseResponse[]>(
+        "/expenses"
+      );
 
-      return response.map(e => new Expense(
-        e.id,
-        e.userId,
-        e.name,
-        e.icon,
-        e.category as ExpenseCategory,
-        e.description,
-        parseFloat(e.amount),
-        e.frequency as Frequency,
-        e.isRecurring,
-        e.nextPaymentDate ? new Date(e.nextPaymentDate) : null,
-        e.splitPercentages,
-        e.isActive,
-        e.isArchived,
-        new Date(e.createdAt),
-        new Date(e.updatedAt),
-        e.archivedAt ? new Date(e.archivedAt) : null
-      ));
+      return response.map(
+        (e) =>
+          new Expense(
+            e.id,
+            e.userId,
+            e.name,
+            e.icon,
+            e.category as ExpenseCategory,
+            e.description,
+            parseFloat(e.amount),
+            e.frequency as Frequency,
+            e.isRecurring,
+            e.nextPaymentDate ? new Date(e.nextPaymentDate) : null,
+            e.splitPercentages,
+            e.isActive,
+            e.isArchived,
+            new Date(e.createdAt),
+            new Date(e.updatedAt),
+            e.archivedAt ? new Date(e.archivedAt) : null
+          )
+      );
     } catch (error) {
-      console.error('Erreur lors de la récupération des dépenses:', error);
-      throw new Error('Impossible de récupérer les dépenses');
+      console.error("Erreur lors de la récupération des dépenses:", error);
+      throw new Error("Impossible de récupérer les dépenses");
     }
   }
 
@@ -58,7 +68,7 @@ export class ExpenseApiAdapter implements ExpensePort {
         name: data.name,
         amount: data.amount,
         category: data.category,
-        description: data.description || '',
+        description: data.description || "",
         frequency: data.frequency,
         isRecurring: data.isRecurring,
       };
@@ -69,7 +79,10 @@ export class ExpenseApiAdapter implements ExpensePort {
         body.nextPaymentDate = normalizedDate.toISOString();
       }
 
-      const response = await this.httpClient.post<BackendExpenseResponse>('/expenses', body);
+      const response = await this.httpClient.post<BackendExpenseResponse>(
+        "/expenses",
+        body
+      );
 
       return new Expense(
         response.id,
@@ -90,7 +103,8 @@ export class ExpenseApiAdapter implements ExpensePort {
         response.archivedAt ? new Date(response.archivedAt) : null
       );
     } catch (error) {
-      throw new Error('Impossible de créer la dépense');
+      console.error("Erreur lors de la création de la dépense:", error);
+      throw new Error("Impossible de créer la dépense");
     }
   }
 
@@ -98,8 +112,8 @@ export class ExpenseApiAdapter implements ExpensePort {
     try {
       await this.httpClient.delete(`/expenses/${expenseId}`);
     } catch (error) {
-      console.error('Erreur lors de la suppression de la dépense:', error);
-      throw new Error('Impossible de supprimer la dépense');
+      console.error("Erreur lors de la suppression de la dépense:", error);
+      throw new Error("Impossible de supprimer la dépense");
     }
   }
 }

@@ -1,6 +1,7 @@
-import { AuthPort, SignInData, SignUpData } from '@/src/domain/ports/outbound';
-import { User, AuthTokens } from '@/src/domain/entities';
-import { HttpClient } from '../http/httpClient';
+import { AuthTokens, User } from "@/src/domain/entities";
+import { AuthPort, SignInData, SignUpData } from "@/src/domain/ports/outbound";
+
+import { HttpClient } from "../http/httpClient";
 
 interface BackendUserResponse {
   id: string;
@@ -29,7 +30,7 @@ export class AuthApiAdapter implements AuthPort {
   async signIn(data: SignInData): Promise<{ user: User; tokens: AuthTokens }> {
     try {
       const response = await this.httpClient.post<BackendAuthResponse>(
-        '/authentication/signin',
+        "/authentication/signin",
         {
           email: data.email,
           password: data.password,
@@ -37,23 +38,23 @@ export class AuthApiAdapter implements AuthPort {
       );
 
       if (!response || !response.user) {
-        throw new Error('Format de réponse invalide du serveur');
+        throw new Error("Format de réponse invalide du serveur");
       }
 
       return this.mapAuthResponse(response);
     } catch (error) {
-      console.error('Erreur dans signIn:', error);
+      console.error("Erreur dans signIn:", error);
       if (error instanceof Error) {
-        throw new Error(error.message || 'Identifiants incorrects');
+        throw new Error(error.message || "Identifiants incorrects");
       }
-      throw new Error('Une erreur est survenue lors de la connexion');
+      throw new Error("Une erreur est survenue lors de la connexion");
     }
   }
 
   async signUp(data: SignUpData): Promise<{ user: User; tokens: AuthTokens }> {
     try {
       const response = await this.httpClient.post<BackendAuthResponse>(
-        '/authentication/signup',
+        "/authentication/signup",
         {
           email: data.email,
           password: data.password,
@@ -62,15 +63,15 @@ export class AuthApiAdapter implements AuthPort {
       );
 
       if (!response || !response.user) {
-        throw new Error('Format de réponse invalide du serveur');
+        throw new Error("Format de réponse invalide du serveur");
       }
 
       return this.mapAuthResponse(response);
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(error.message || 'Impossible de créer le compte');
+        throw new Error(error.message || "Impossible de créer le compte");
       }
-      throw new Error('Une erreur est survenue lors de l\'inscription');
+      throw new Error("Une erreur est survenue lors de l'inscription");
     }
   }
 
@@ -78,11 +79,14 @@ export class AuthApiAdapter implements AuthPort {
     try {
       await this.httpClient.post(`/authentication/signout/${userId}`);
     } catch (error) {
-      console.warn('Erreur lors du signOut backend:', error);
+      console.warn("Erreur lors du signOut backend:", error);
     }
   }
 
-  private mapAuthResponse(response: BackendAuthResponse): { user: User; tokens: AuthTokens } {
+  private mapAuthResponse(response: BackendAuthResponse): {
+    user: User;
+    tokens: AuthTokens;
+  } {
     const user = new User(
       response.user.id,
       response.user.email,
@@ -90,10 +94,7 @@ export class AuthApiAdapter implements AuthPort {
       new Date()
     );
 
-    const tokens = new AuthTokens(
-      response.accessToken,
-      response.refreshToken
-    );
+    const tokens = new AuthTokens(response.accessToken, response.refreshToken);
 
     return { user, tokens };
   }

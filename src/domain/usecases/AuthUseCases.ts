@@ -1,11 +1,16 @@
-import { User } from '../entities';
-import { AuthPort, StoragePort } from '../ports/outbound';
-import { AuthUseCasePort, SignInCommand, SignUpCommand } from '../ports/inbound';
+import {
+  AuthUseCasePort,
+  SignInCommand,
+  SignUpCommand,
+} from "../ports/inbound";
+import { AuthPort, StoragePort } from "../ports/outbound";
+
+import { User } from "../entities";
 
 const STORAGE_KEYS = {
-  ACCESS_TOKEN: 'auth_access_token',
-  REFRESH_TOKEN: 'auth_refresh_token',
-  USER: 'auth_user',
+  ACCESS_TOKEN: "auth_access_token",
+  REFRESH_TOKEN: "auth_refresh_token",
+  USER: "auth_user",
 } as const;
 
 export class AuthUseCases implements AuthUseCasePort {
@@ -16,7 +21,7 @@ export class AuthUseCases implements AuthUseCasePort {
 
   async signIn(command: SignInCommand): Promise<User> {
     if (!command.email || !command.password) {
-      throw new Error('Email et mot de passe requis');
+      throw new Error("Email et mot de passe requis");
     }
 
     const { user, tokens } = await this.authPort.signIn({
@@ -25,29 +30,38 @@ export class AuthUseCases implements AuthUseCasePort {
     });
 
     if (!tokens.accessToken || !tokens.refreshToken) {
-      throw new Error('Tokens manquants dans la réponse');
+      throw new Error("Tokens manquants dans la réponse");
     }
 
-    await this.storagePort.saveSecure(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
-    await this.storagePort.saveSecure(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
+    await this.storagePort.saveSecure(
+      STORAGE_KEYS.ACCESS_TOKEN,
+      tokens.accessToken
+    );
+    await this.storagePort.saveSecure(
+      STORAGE_KEYS.REFRESH_TOKEN,
+      tokens.refreshToken
+    );
 
-    await this.storagePort.save(STORAGE_KEYS.USER, JSON.stringify({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: user.createdAt.toISOString(),
-    }));
+    await this.storagePort.save(
+      STORAGE_KEYS.USER,
+      JSON.stringify({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt.toISOString(),
+      })
+    );
 
     return user;
   }
 
   async signUp(command: SignUpCommand): Promise<User> {
     if (!command.email || !command.password || !command.name) {
-      throw new Error('Tous les champs sont requis');
+      throw new Error("Tous les champs sont requis");
     }
 
     if (command.name.trim().length < 2) {
-      throw new Error('Le nom doit contenir au moins 2 caractères');
+      throw new Error("Le nom doit contenir au moins 2 caractères");
     }
 
     const { user, tokens } = await this.authPort.signUp({
@@ -57,18 +71,27 @@ export class AuthUseCases implements AuthUseCasePort {
     });
 
     if (!tokens.accessToken || !tokens.refreshToken) {
-      throw new Error('Tokens manquants dans la réponse');
+      throw new Error("Tokens manquants dans la réponse");
     }
 
-    await this.storagePort.saveSecure(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken);
-    await this.storagePort.saveSecure(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken);
+    await this.storagePort.saveSecure(
+      STORAGE_KEYS.ACCESS_TOKEN,
+      tokens.accessToken
+    );
+    await this.storagePort.saveSecure(
+      STORAGE_KEYS.REFRESH_TOKEN,
+      tokens.refreshToken
+    );
 
-    await this.storagePort.save(STORAGE_KEYS.USER, JSON.stringify({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: user.createdAt.toISOString(),
-    }));
+    await this.storagePort.save(
+      STORAGE_KEYS.USER,
+      JSON.stringify({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt.toISOString(),
+      })
+    );
 
     return user;
   }
@@ -80,7 +103,7 @@ export class AuthUseCases implements AuthUseCasePort {
       try {
         await this.authPort.signOut(user.id);
       } catch (error) {
-        console.warn('Erreur lors du signOut backend:', error);
+        console.warn("Erreur lors du signOut backend:", error);
       }
     }
 
@@ -106,7 +129,7 @@ export class AuthUseCases implements AuthUseCasePort {
         new Date(userData.createdAt)
       );
     } catch (error) {
-      console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+      console.error("Erreur lors de la récupération de l'utilisateur:", error);
       return null;
     }
   }

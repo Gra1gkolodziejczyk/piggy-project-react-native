@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Bank, Transaction, TransactionType } from '@/src/domain/entities';
-import { financeUseCases } from '@/src/infrastructure/config';
+import { Bank, Transaction, TransactionType } from "@/src/domain/entities";
+import { useEffect, useState } from "react";
+
+import { financeUseCases } from "@/src/infrastructure/config";
 
 export function useFinance() {
   const [bankAccount, setBankAccount] = useState<Bank | null>(null);
@@ -22,7 +23,7 @@ export function useFinance() {
       setBankAccount(account);
       setTransactions(txs);
     } catch (error) {
-      console.error('Erreur chargement données:', error);
+      console.error("Erreur chargement données:", error);
     } finally {
       setIsLoading(false);
     }
@@ -42,7 +43,7 @@ export function useFinance() {
     amount: number,
     type: TransactionType,
     category: string,
-    frequency: 'once' | 'weekly' | 'monthly' | 'yearly',
+    frequency: "once" | "weekly" | "monthly" | "yearly",
     isRecurring: boolean,
     nextPaymentDate?: Date,
     description?: string

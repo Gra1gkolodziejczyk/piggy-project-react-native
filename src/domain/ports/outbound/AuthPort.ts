@@ -1,4 +1,4 @@
-import { User, AuthTokens } from '../../entities';
+import { AuthTokens, User } from "../../entities";
 
 export interface SignInData {
   email: string;

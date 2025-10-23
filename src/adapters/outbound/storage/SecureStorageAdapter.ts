@@ -1,12 +1,12 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StoragePort } from '@/src/domain/ports/outbound';
+import { StoragePort } from "@/src/domain/ports/outbound";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export class SecureStorageAdapter implements StoragePort {
   async saveSecure(key: string, value: string): Promise<void> {
     try {
       await AsyncStorage.setItem(`secure_${key}`, value);
     } catch (error) {
-      throw new Error('Impossible de sauvegarder les données');
+      throw new Error("Impossible de sauvegarder les données");
     }
   }
 
@@ -32,7 +32,7 @@ export class SecureStorageAdapter implements StoragePort {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      throw new Error('Impossible de sauvegarder les données');
+      throw new Error("Impossible de sauvegarder les données");
     }
   }
 
@@ -58,7 +58,7 @@ export class SecureStorageAdapter implements StoragePort {
       await AsyncStorage.clear();
       console.log(`✅ Cleared all storage`);
     } catch (error) {
-      console.error('❌ Erreur lors du nettoyage du storage:', error);
+      console.error("❌ Erreur lors du nettoyage du storage:", error);
     }
   }
 }

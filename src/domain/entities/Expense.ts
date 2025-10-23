@@ -1,17 +1,17 @@
 export enum ExpenseCategory {
-  GROCERIES = 'groceries',
-  TRANSPORT = 'transport',
-  HOUSING = 'housing',
-  ENTERTAINMENT = 'entertainment',
-  HEALTH = 'health',
-  OTHER = 'other',
+  GROCERIES = "groceries",
+  TRANSPORT = "transport",
+  HOUSING = "housing",
+  ENTERTAINMENT = "entertainment",
+  HEALTH = "health",
+  OTHER = "other",
 }
 
 export enum Frequency {
-  ONCE = 'once',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
+  ONCE = "once",
+  WEEKLY = "weekly",
+  MONTHLY = "monthly",
+  YEARLY = "yearly",
 }
 
 export class Expense {
@@ -35,17 +35,17 @@ export class Expense {
   ) {}
 
   formatAmount(): string {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
     }).format(this.amount);
   }
 
   getIcon(): string {
-    return '↘️';
+    return "↘️";
   }
 
   getColor(): string {
-    return '#FF3B30';
+    return "#FF3B30";
   }
 }

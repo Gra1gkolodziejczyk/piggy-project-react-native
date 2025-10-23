@@ -1,15 +1,15 @@
 export enum IncomeType {
-  SALARY = 'salary',
-  FREELANCE = 'freelance',
-  INVESTMENT = 'investment',
-  OTHER = 'other',
+  SALARY = "salary",
+  FREELANCE = "freelance",
+  INVESTMENT = "investment",
+  OTHER = "other",
 }
 
 export enum Frequency {
-  ONCE = 'once',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
+  ONCE = "once",
+  WEEKLY = "weekly",
+  MONTHLY = "monthly",
+  YEARLY = "yearly",
 }
 
 export class Income {
@@ -31,17 +31,17 @@ export class Income {
   ) {}
 
   formatAmount(): string {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
     }).format(this.amount);
   }
 
   getIcon(): string {
-    return '↗️';
+    return "↗️";
   }
 
   getColor(): string {
-    return '#34C759';
+    return "#34C759";
   }
 }

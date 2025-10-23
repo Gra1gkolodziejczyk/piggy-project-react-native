@@ -28,7 +28,7 @@ export class HttpClient {
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       };
 
       if (options?.headers) {
@@ -38,7 +38,7 @@ export class HttpClient {
 
       const token = this.tokenProvider ? await this.tokenProvider() : null;
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers["Authorization"] = `Bearer ${token}`;
       }
 
       const response = await fetch(url, {
@@ -49,59 +49,65 @@ export class HttpClient {
 
       clearTimeout(timeoutId);
 
-      if (response.status === 204 || response.headers.get('content-length') === '0') {
+      if (
+        response.status === 204 ||
+        response.headers.get("content-length") === "0"
+      ) {
         return {} as T;
       }
 
       const data = await response.json();
 
       if (!response.ok) {
-        const errorMessage = data.message || data.error || `Erreur HTTP ${response.status}`;
+        const errorMessage =
+          data.message || data.error || `Erreur HTTP ${response.status}`;
         throw new Error(errorMessage);
       }
 
       return data;
     } catch (error) {
       if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          throw new Error('La requête a expiré. Vérifiez votre connexion internet.');
+        if (error.name === "AbortError") {
+          throw new Error(
+            "La requête a expiré. Vérifiez votre connexion internet."
+          );
         }
         throw error;
       }
-      throw new Error('Une erreur est survenue lors de la requête');
+      throw new Error("Une erreur est survenue lors de la requête");
     }
   }
 
   async get<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, {
-      method: 'GET',
+      method: "GET",
     });
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
-      method: 'POST',
+      method: "POST",
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
-      method: 'PUT',
+      method: "PUT",
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   async patch<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
-      method: 'PATCH',
+      method: "PATCH",
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   async delete<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 }
