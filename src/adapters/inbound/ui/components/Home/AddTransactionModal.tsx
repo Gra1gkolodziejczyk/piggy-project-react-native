@@ -77,9 +77,6 @@ export default function AddTransactionModal({
   const namePlaceholder =
     type === TransactionType.INCOME ? "Ex: Salaire mensuel" : "Ex: Courses";
 
-  const nameDescriptionPlaceholder =
-    type === TransactionType.INCOME ? "Ex: Salaire mensuel" : "Ex: Courses";
-
   const getNextPaymentDate = (): Date | undefined => {
     if (!isRecurring) return undefined;
 
@@ -386,7 +383,7 @@ export default function AddTransactionModal({
               <Text style={styles.label}>Description</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
-                placeholder={nameDescriptionPlaceholder}
+                placeholder={namePlaceholder}
                 value={description}
                 onChangeText={setDescription}
                 editable={!isLoading}
