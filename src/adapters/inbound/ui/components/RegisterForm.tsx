@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { useAuth } from "@/src/adapters/inbound/ui/hooks";
 
 export const RegisterForm = () => {

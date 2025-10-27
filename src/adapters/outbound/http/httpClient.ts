@@ -1,5 +1,3 @@
-import {error} from "@expo/fingerprint/cli/build/utils/log";
-
 export interface HttpClientConfig {
   baseUrl: string;
   timeout?: number;
@@ -43,7 +41,7 @@ export class HttpClient {
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       } else {
-        throw error("Token manquant. Veuillez vous connecter ou vous inscrire.")
+        console.log("Token manquant. Veuillez vous connecter ou vous inscrire.")
       }
 
       const response = await fetch(url, {
