@@ -6,7 +6,7 @@ export class SecureStorageAdapter implements StoragePort {
     try {
       await AsyncStorage.setItem(`secure_${key}`, value);
     } catch (error) {
-      throw new Error("Impossible de sauvegarder les données");
+      throw new Error("Impossible to save datas");
     }
   }
 
@@ -15,7 +15,7 @@ export class SecureStorageAdapter implements StoragePort {
       const value = await AsyncStorage.getItem(`secure_${key}`);
       return value;
     } catch (error) {
-      console.error(`❌ Erreur lors de la lecture de ${key}:`, error);
+      console.error(`❌ Error when the key is reading  ${key}:`, error);
       return null;
     }
   }
@@ -24,7 +24,7 @@ export class SecureStorageAdapter implements StoragePort {
     try {
       await AsyncStorage.removeItem(`secure_${key}`);
     } catch (error) {
-      console.error(`❌ Erreur lors de la suppression de ${key}:`, error);
+      console.error(`❌ Error when the key is deleted  ${key}:`, error);
     }
   }
 
@@ -32,7 +32,7 @@ export class SecureStorageAdapter implements StoragePort {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      throw new Error("Impossible de sauvegarder les données");
+      throw new Error("Impossible to save datas");
     }
   }
 
@@ -49,7 +49,7 @@ export class SecureStorageAdapter implements StoragePort {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error(`❌ Erreur lors de la suppression de ${key}:`, error);
+      console.error(`❌ Error when the key is deleted ${key}:`, error);
     }
   }
 

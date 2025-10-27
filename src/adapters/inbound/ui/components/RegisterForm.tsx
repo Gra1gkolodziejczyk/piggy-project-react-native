@@ -37,7 +37,7 @@ export const RegisterForm = () => {
       await signUp(email.trim(), password, name.trim());
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Erreur de connexion";
+        error instanceof Error ? error.message : "Error in signup:";
       setError(message);
     } finally {
       setLoading(false);

@@ -31,7 +31,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    checkAuthStatus();
+    checkAuthStatus()
   }, []);
 
   const checkAuthStatus = async () => {
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(null);
       }
     } catch (error) {
-      await handleInvalidToken();
+      throw error && await handleInvalidToken();
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await authUseCases.signOut();
     } catch (error) {
-      console.error('[Auth] Erreur lors du nettoyage du token:', error);
+      console.error("AUTH: error logout :", error);
     }
     setUser(null);
   };
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await authUseCases.signOut();
       setUser(null);
     } catch (error) {
-      setUser(null);
+      throw error && setUser(null);
     } finally {
       setIsLoading(false);
     }
