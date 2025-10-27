@@ -2,6 +2,7 @@ import { Bank, Transaction, TransactionType } from "@/src/domain/entities";
 import { useEffect, useState } from "react";
 
 import { financeUseCases } from "@/src/infrastructure/config";
+import {TokenService} from "@/src/infrastructure/services/TokenService";
 
 export function useFinance() {
   const [bankAccount, setBankAccount] = useState<Bank | null>(null);
@@ -10,7 +11,11 @@ export function useFinance() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    loadData();
+    const debugToken = async () => {
+      await TokenService.hasToken();
+    };
+    loadData()
+    debugToken();
   }, []);
 
   const loadData = async () => {

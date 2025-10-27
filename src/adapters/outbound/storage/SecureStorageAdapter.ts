@@ -56,9 +56,7 @@ export class SecureStorageAdapter implements StoragePort {
   async clear(): Promise<void> {
     try {
       await AsyncStorage.clear();
-      console.log(`✅ Cleared all storage`);
     } catch (error) {
-      console.error("❌ Erreur lors du nettoyage du storage:", error);
     }
   }
 }

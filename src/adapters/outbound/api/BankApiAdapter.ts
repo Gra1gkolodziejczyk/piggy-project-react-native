@@ -17,7 +17,6 @@ export class BankApiAdapter implements BankAccountPort {
   async getBankAccount(): Promise<Bank> {
     try {
       const response = await this.httpClient.get<BackendBankResponse>("/banks");
-
       return new Bank(
         response.id,
         response.userId,
@@ -27,8 +26,18 @@ export class BankApiAdapter implements BankAccountPort {
         new Date(response.createdAt)
       );
     } catch (error) {
-      console.error("Erreur lors de la récupération du compte:", error);
-      throw new Error("Impossible de récupérer les données bancaires");
+
+      if (error instanceof Error) {
+        if (error.message.includes('Unauthorized') || error.message.includes('401')) {
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        }
+
+        if (error.message.includes('Network') || error.message.includes('fetch')) {
+          throw new Error('Impossible de se connecter au serveur. Vérifiez votre connexion internet.');
+        }
+      }
+
+      throw new Error('Impossible de récupérer les données bancaires');
     }
   }
 
@@ -48,7 +57,17 @@ export class BankApiAdapter implements BankAccountPort {
         new Date(response.createdAt)
       );
     } catch (error) {
-      console.error("Erreur lors de l'ajout au solde:", error);
+
+      if (error instanceof Error) {
+        if (error.message.includes('Unauthorized') || error.message.includes('401')) {
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        }
+
+        if (error.message.includes('Bad Request') || error.message.includes('400')) {
+          throw new Error('Montant invalide. Veuillez vérifier les données saisies.');
+        }
+      }
+
       throw new Error("Impossible d'ajouter au solde");
     }
   }
@@ -69,7 +88,21 @@ export class BankApiAdapter implements BankAccountPort {
         new Date(response.createdAt)
       );
     } catch (error) {
-      console.error("Erreur lors du retrait du solde:", error);
+
+      if (error instanceof Error) {
+        if (error.message.includes('Unauthorized') || error.message.includes('401')) {
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        }
+
+        if (error.message.includes('Bad Request') || error.message.includes('400')) {
+          throw new Error('Montant invalide ou solde insuffisant.');
+        }
+
+        if (error.message.includes('Insufficient')) {
+          throw new Error('Solde insuffisant pour effectuer cette opération.');
+        }
+      }
+
       throw new Error("Impossible de retirer du solde");
     }
   }
@@ -90,7 +123,18 @@ export class BankApiAdapter implements BankAccountPort {
         new Date(response.createdAt)
       );
     } catch (error) {
-      console.error("Erreur lors du changement de devise:", error);
+      console.error('[BankApiAdapter] ❌ Erreur changement de devise:', error);
+
+      if (error instanceof Error) {
+        if (error.message.includes('Unauthorized') || error.message.includes('401')) {
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        }
+
+        if (error.message.includes('Bad Request') || error.message.includes('400')) {
+          throw new Error('Devise invalide. Veuillez sélectionner une devise valide.');
+        }
+      }
+
       throw new Error("Impossible de changer la devise");
     }
   }

@@ -1,6 +1,5 @@
 import React, { ReactNode, createContext, useEffect, useState } from "react";
-
-import { User } from "../../domain/entities";
+import { User } from "@/src/domain/entities";
 import { authUseCases } from "../config";
 
 interface AuthContextValue {
@@ -38,16 +37,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuthStatus = async () => {
     try {
       const currentUser = await authUseCases.getCurrentUser();
-      setUser(currentUser);
+
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
     } catch (error) {
-      console.error(
-        "Erreur lors de la vérification de l'authentification:",
-        error
-      );
-      setUser(null);
+      await handleInvalidToken();
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleInvalidToken = async () => {
+    try {
+      await authUseCases.signOut();
+    } catch (error) {
+      console.error('[Auth] Erreur lors du nettoyage du token:', error);
+    }
+    setUser(null);
   };
 
   const signIn = async (email: string, password: string) => {
@@ -82,7 +91,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await authUseCases.signOut();
       setUser(null);
     } catch (error) {
-      console.error("Erreur lors de la déconnexion:", error);
       setUser(null);
     } finally {
       setIsLoading(false);

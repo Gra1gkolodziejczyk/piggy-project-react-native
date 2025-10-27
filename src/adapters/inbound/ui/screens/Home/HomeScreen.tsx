@@ -7,10 +7,12 @@ import {
   RefreshControl,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFinance } from '../../hooks';
+import { useAuth } from '@/src/infrastructure/providers';
 import TransactionCard from '../../components/Home/TransactionCard';
 import AddTransactionModal from '../../components/Home/AddTransactionModal';
 
@@ -25,7 +27,33 @@ export default function HomeScreen() {
     addTransaction,
   } = useFinance();
 
+  const { signOut, user } = useAuth();
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleSignOut = async () => {
+    Alert.alert(
+      'Déconnexion',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Se déconnecter',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+            } catch (error) {
+              console.error('Erreur lors de la déconnexion:', error);
+              Alert.alert('Erreur', 'Impossible de se déconnecter');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   if (isLoading) {
     return (
@@ -38,6 +66,21 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <View style={styles.userInfo}>
+          <Text style={styles.greeting}>Bonjour</Text>
+          <Text style={styles.userName}>{user?.name || user?.email || 'Utilisateur'}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleSignOut}
+          accessibilityLabel="Se déconnecter"
+          accessibilityRole="button"
+        >
+          <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -98,6 +141,8 @@ export default function HomeScreen() {
         style={styles.fab}
         onPress={() => setIsModalVisible(true)}
         activeOpacity={0.8}
+        accessibilityLabel="Ajouter une transaction"
+        accessibilityRole="button"
       >
         <Ionicons name="add" size={32} color="#FFFFFF" />
       </TouchableOpacity>
@@ -126,6 +171,33 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: '#666666',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  greeting: {
+    fontSize: 14,
+    color: '#8E8E93',
+    marginBottom: 2,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000000',
+  },
+  logoutButton: {
+    padding: 8,
+    minWidth: 40,
+    minHeight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     flex: 1,

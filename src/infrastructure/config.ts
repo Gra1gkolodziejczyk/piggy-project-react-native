@@ -6,14 +6,18 @@ import { ExpenseApiAdapter } from "../adapters/outbound/api/ExpenseApiAdapter";
 import { IncomeApiAdapter } from "../adapters/outbound/api/IncomeApiAdapter";
 import { HttpClient } from "../adapters/outbound/http/httpClient";
 import { FinanceUseCases } from "../domain/usecases/FinanceUseCases";
+import {TokenService} from "@/src/infrastructure/services/TokenService";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
-
-console.log("API_BASE_URL:", API_BASE_URL);
 
 export const httpClient = new HttpClient({
   baseUrl: API_BASE_URL,
   timeout: 30000,
+});
+
+httpClient.setTokenProvider(async () => {
+  const token = await TokenService.getToken();
+  return token;
 });
 
 export const storageAdapter = new SecureStorageAdapter();
@@ -28,7 +32,3 @@ export const financeUseCases = new FinanceUseCases(
   incomeApiAdapter,
   expenseApiAdapter
 );
-
-httpClient.setTokenProvider(async () => {
-  return await authUseCases.getAccessToken();
-});

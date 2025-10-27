@@ -1,47 +1,72 @@
-import { AuthTokens, User } from "@/src/domain/entities";
-import { AuthPort, SignInData, SignUpData } from "@/src/domain/ports/outbound";
-
 import { HttpClient } from "../http/httpClient";
+import { TokenService } from "@/src/infrastructure/services/TokenService";
+import { User } from "@/src/domain/entities/User";
+import { AuthPort } from "@/src/domain/ports/outbound";
 
-interface BackendUserResponse {
-  id: string;
+export interface SignInCredentials {
   email: string;
-  name: string;
-  age?: number | null;
-  phoneNumber?: string | null;
-  emailVerified?: boolean;
-  image?: string | null;
-  stripeId?: string | null;
-  lang?: string;
-  isActive?: boolean;
-  emailNotification?: boolean;
-  smsNotification?: boolean;
+  password: string;
 }
 
-interface BackendAuthResponse {
-  user: BackendUserResponse;
+export interface SignUpCredentials {
+  email: string;
+  password: string;
+  name: string;
+}
+
+interface AuthApiResponse {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    phoneNumber: string | null;
+    emailVerified: boolean;
+    image: string | null;
+    stripeId: string | null;
+    lang: string;
+    isActive: boolean;
+    emailNotification: boolean;
+    smsNotification: boolean;
+  };
   accessToken: string;
   refreshToken: string;
+}
+
+interface AuthResult {
+  user: User;
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
+  };
 }
 
 export class AuthApiAdapter implements AuthPort {
   constructor(private readonly httpClient: HttpClient) {}
 
-  async signIn(data: SignInData): Promise<{ user: User; tokens: AuthTokens }> {
+  async signIn(credentials: SignInCredentials): Promise<AuthResult> {
     try {
-      const response = await this.httpClient.post<BackendAuthResponse>(
+      const response = await this.httpClient.post<AuthApiResponse>(
         "/authentication/signin",
-        {
-          email: data.email,
-          password: data.password,
-        }
+        credentials
+      );
+      if (!response.accessToken || !response.refreshToken) {
+        throw new Error('Tokens manquants dans la réponse du serveur');
+      }
+      await TokenService.setToken(response.accessToken);
+      const user = new User(
+        response.user.id,
+        response.user.email,
+        response.user.name,
+        new Date()
       );
 
-      if (!response || !response.user) {
-        throw new Error("Format de réponse invalide du serveur");
-      }
-
-      return this.mapAuthResponse(response);
+      return {
+        user,
+        tokens: {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        },
+      };
     } catch (error) {
       console.error("Erreur dans signIn:", error);
       if (error instanceof Error) {
@@ -51,25 +76,37 @@ export class AuthApiAdapter implements AuthPort {
     }
   }
 
-  async signUp(data: SignUpData): Promise<{ user: User; tokens: AuthTokens }> {
+  async signUp(credentials: SignUpCredentials): Promise<AuthResult> {
     try {
-      const response = await this.httpClient.post<BackendAuthResponse>(
+
+      const response = await this.httpClient.post<AuthApiResponse>(
         "/authentication/signup",
-        {
-          email: data.email,
-          password: data.password,
-          name: data.name,
-        }
+        credentials
       );
 
-      if (!response || !response.user) {
-        throw new Error("Format de réponse invalide du serveur");
+      if (!response.accessToken || !response.refreshToken) {
+        throw new Error('Tokens manquants dans la réponse du serveur');
       }
 
-      return this.mapAuthResponse(response);
+      await TokenService.setToken(response.accessToken);
+
+      const user = new User(
+        response.user.id,
+        response.user.email,
+        response.user.name,
+        new Date()
+      );
+
+      return {
+        user,
+        tokens: {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        },
+      };
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(error.message || "Impossible de créer le compte");
+        throw new Error(error.message || "Erreur lors de l'inscription");
       }
       throw new Error("Une erreur est survenue lors de l'inscription");
     }
@@ -77,25 +114,40 @@ export class AuthApiAdapter implements AuthPort {
 
   async signOut(userId: string): Promise<void> {
     try {
-      await this.httpClient.post(`/authentication/signout/${userId}`);
+      await this.httpClient.post("/authentication/signout", { userId });
     } catch (error) {
-      console.warn("Erreur lors du signOut backend:", error);
+      throw error;
     }
   }
 
-  private mapAuthResponse(response: BackendAuthResponse): {
-    user: User;
-    tokens: AuthTokens;
-  } {
-    const user = new User(
-      response.user.id,
-      response.user.email,
-      response.user.name,
-      new Date()
-    );
+  async getCurrentUser(): Promise<User | null> {
+    try {
+      const hasToken = await TokenService.hasToken();
 
-    const tokens = new AuthTokens(response.accessToken, response.refreshToken);
+      if (!hasToken) {
+        return null;
+      }
 
-    return { user, tokens };
+      const response = await this.httpClient.get<{
+        id: string;
+        email: string;
+        name: string;
+      }>("/users/me");
+
+      const user = new User(
+        response.id,
+        response.email,
+        response.name,
+        new Date()
+      );
+
+      return user;
+    } catch (error) {
+      if (error instanceof Error &&
+        (error.message.includes('Unauthorized') || error.message.includes('401'))) {
+        await TokenService.removeToken();
+      }
+      throw error;
+    }
   }
 }

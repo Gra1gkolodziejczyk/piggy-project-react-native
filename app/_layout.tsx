@@ -1,8 +1,8 @@
 import { AuthProvider, useAuth } from "@/src/infrastructure/providers";
 import { Stack, useRouter, useSegments } from "expo-router";
-
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 
 function RootLayoutNav() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -10,21 +10,31 @@ function RootLayoutNav() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) return;
-
+    if (isLoading) {
+      return;
+    }
     const inAuthGroup = segments[0] === "(auth)";
+    const inAppGroup = segments[0] === "(tabs)";
 
-    if (isAuthenticated && inAuthGroup) {
-      router.replace("/");
-    } else if (!isAuthenticated && !inAuthGroup) {
-      router.replace("/login");
+    if (!isAuthenticated && !inAuthGroup) {
+      router.replace("/(auth)/login");
+    } else if (isAuthenticated && inAuthGroup) {
+      router.replace("/(tabs)/");
     }
   }, [isAuthenticated, segments, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(app)" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );
 }
@@ -38,3 +48,12 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+});

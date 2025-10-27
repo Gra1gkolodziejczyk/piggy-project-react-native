@@ -1,3 +1,5 @@
+import {error} from "@expo/fingerprint/cli/build/utils/log";
+
 export interface HttpClientConfig {
   baseUrl: string;
   timeout?: number;
@@ -24,6 +26,7 @@ export class HttpClient {
     const url = `${this.baseUrl}${endpoint}`;
 
     try {
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -39,6 +42,8 @@ export class HttpClient {
       const token = this.tokenProvider ? await this.tokenProvider() : null;
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
+      } else {
+        throw error("Token manquant. Veuillez vous connecter ou vous inscrire.")
       }
 
       const response = await fetch(url, {
@@ -46,9 +51,7 @@ export class HttpClient {
         signal: controller.signal,
         headers,
       });
-
       clearTimeout(timeoutId);
-
       if (
         response.status === 204 ||
         response.headers.get("content-length") === "0"
@@ -56,7 +59,13 @@ export class HttpClient {
         return {} as T;
       }
 
-      const data = await response.json();
+      let data;
+      try {
+        const textResponse = await response.text();
+        data = textResponse ? JSON.parse(textResponse) : {};
+      } catch (parseError) {
+        throw new Error('Réponse invalide du serveur');
+      }
 
       if (!response.ok) {
         const errorMessage =
